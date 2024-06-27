@@ -12,3 +12,7 @@
 
 - Task summary: Used the next day to keep the momentum going for Android Edge Vision for Logistics. I was still piecing things together, so I focused on trying to map the current manual workflow and list the failure points worth fixing first and wrote down the stuff that looked important. This was still the messy setup part where I was opening files, checking examples, and trying not to overthink it too early. This kind of project only works if the logic feels practical, so I spent time checking the flow again and again.
 - Deliverable: I wrapped up the day with current-state workflow mostly in place. It was not perfect, but it was good enough to keep the project moving. There were still a couple of loose parts, but nothing serious enough to block the next step.
+## 2024-06-27 - Day 3: Scope pass
+
+- Task summary: By this point I had the rough direction, so the work became more practical. I spent most of the day trying to choose a realistic first version with only the core use cases and make the whole thing feel less half baked. Once the base made some sense, I could finally move a bit faster and stop second guessing every tiny decision. A lot of the work here was really about workflow thinking, not just screens or files.
+- Deliverable: I wrapped up the day with version 1 scope mostly in place. It was not perfect, but it was good enough to keep the project moving. It was not super polished, just stable enough that I felt okay moving forward.
