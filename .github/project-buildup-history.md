@@ -20,3 +20,7 @@
 
 - Task summary: One more pass: resolved a merge conflict that came up when I switched branches to check something else.
 - Deliverable: One of those satisfying small wins.
+## 2024-06-27 - Day 3: Scope pass
+
+- Task summary: Quick follow-up: the variable names were inconsistent so cleaned those up across the notebook before calling it done.
+- Deliverable: Wrapped it up properly this time.
