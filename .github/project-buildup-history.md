@@ -16,3 +16,7 @@
 
 - Task summary: By this point I had the rough direction, so the work became more practical. I spent most of the day trying to choose a realistic first version with only the core use cases and make the whole thing feel less half baked. Once the base made some sense, I could finally move a bit faster and stop second guessing every tiny decision. A lot of the work here was really about workflow thinking, not just screens or files.
 - Deliverable: I wrapped up the day with version 1 scope mostly in place. It was not perfect, but it was good enough to keep the project moving. It was not super polished, just stable enough that I felt okay moving forward.
+## 2024-06-27 - Day 3: Scope pass
+
+- Task summary: One more pass: resolved a merge conflict that came up when I switched branches to check something else.
+- Deliverable: One of those satisfying small wins.
