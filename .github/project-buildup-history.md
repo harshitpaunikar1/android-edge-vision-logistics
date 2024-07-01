@@ -36,3 +36,7 @@
 
 - Task summary: Got stuck mid-afternoon and had to regroup — updated the requirements file — had missed one indirect dependency.
 - Deliverable: Solid now, moving on.
+## 2024-07-01 - Day 5: Data model
+
+- Task summary: Came back after lunch and realized fixed a type coercion issue that was causing silent NaN propagation downstream.
+- Deliverable: Wrapped it up properly this time.
