@@ -32,3 +32,7 @@
 
 - Task summary: By this point I had the rough direction, so the work became more practical. I spent most of the day trying to list the entities, statuses, and fields the system needs to track and make the whole thing feel less half baked. By now I had enough structure to keep going without staring at the screen too long, which honestly helped a lot. This kind of project only works if the logic feels practical, so I spent time checking the flow again and again.
 - Deliverable: I wrapped up the day with data model draft mostly in place. It was not perfect, but it was good enough to keep the project moving. There were still a couple of loose parts, but nothing serious enough to block the next step.
+## 2024-07-01 - Day 5: Data model
+
+- Task summary: Got stuck mid-afternoon and had to regroup — updated the requirements file — had missed one indirect dependency.
+- Deliverable: Solid now, moving on.
