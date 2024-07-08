@@ -56,3 +56,7 @@
 
 - Task summary: Closer to the end, I was mostly tightening things up instead of inventing new scope. The job for the day was to add validation, business rules, and edge cases from the workflow map so the final result looked a bit more complete. Once the base made some sense, I could finally move a bit faster and stop second guessing every tiny decision. A lot of the work here was really about workflow thinking, not just screens or files.
 - Deliverable: Ended the day with rules and constraints in hand, plus a few side notes on what still needed fixing later. It was not super polished, just stable enough that I felt okay moving forward.
+## 2024-07-08 - Day 10: Artifacts
+
+- Task summary: Closer to the end, I was mostly tightening things up instead of inventing new scope. The job for the day was to create diagrams, screenshots, or examples that explain the system quickly so the final result looked a bit more complete. Most of the heavy lifting was already done, so this part was more about making the rough edges less obvious. I kept imagining how an actual operator would move through the steps so the project would not feel fake.
+- Deliverable: Ended the day with support artifacts in hand, plus a few side notes on what still needed fixing later. I also left myself a few rough reminders for the next day so I would not have to rediscover the same context again.
