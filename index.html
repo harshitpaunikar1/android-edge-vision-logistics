@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edge Vision Tear-Down: TensorFlow Lite on Android</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=IBM+Plex+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* 
+      DESIGN SYSTEM: "Engineering Tear-Down"
+      Black and white only. Typography-driven.
+      Dense multi-column structure, monospace parameter callouts, debug log headings.
+    */
+    :root {
+      --bg: #ffffff;
+      --text: #1a1a1a;
+      --text-muted: #555555;
+      --border-thick: #111111;
+      --border-thin: #cccccc;
+      --f-body: 'IBM Plex Sans', sans-serif;
+      --f-mono: 'JetBrains Mono', monospace;
+      --code-bg: #111111;
+      --code-text: #f5f5f5;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--f-body);
+      font-size: 1.05rem;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Container */
+    .tear-down-shell {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 3rem 2rem;
+    }
+
+    header {
+      margin-bottom: 4rem;
+      border-bottom: 4px solid var(--border-thick);
+      padding-bottom: 2rem;
+    }
+
+    .meta-tag {
+      font-family: var(--f-mono);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    h1 {
+      font-family: var(--f-mono);
+      font-size: 3.5rem;
+      font-weight: 700;
+      line-height: 1.1;
+      letter-spacing: -0.05em;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+    }
+
+    .abstract {
+      font-size: 1.25rem;
+      font-weight: 300;
+      color: var(--text-muted);
+      max-width: 800px;
+    }
+
+    /* Layout: Dense Column Grid */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      grid-gap: 3rem;
+    }
+
+    /* Side Callouts */
+    .param-column {
+      border-right: 1px dashed var(--border-thin);
+      padding-right: 2rem;
+    }
+
+    .param-box {
+      margin-bottom: 2.5rem;
+    }
+
+    .param-box strong {
+      font-family: var(--f-mono);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      display: block;
+      color: var(--text-muted);
+      margin-bottom: 0.25rem;
+    }
+
+    .param-box span {
+      font-family: var(--f-mono);
+      font-size: 1rem;
+      color: var(--border-thick);
+      font-weight: 700;
+    }
+
+    /* Main Prose */
+    .main-column p {
+      margin-bottom: 1.5rem;
+    }
+
+    /* Debug Headings */
+    h2 {
+      font-family: var(--f-mono);
+      font-size: 1.3rem;
+      text-transform: uppercase;
+      margin-top: 4rem;
+      margin-bottom: 1.5rem;
+      border-top: 1px solid var(--border-thick);
+      padding-top: 1rem;
+      color: var(--border-thick);
+    }
+    
+    h2::before {
+      content: "> ";
+      color: var(--text-muted);
+    }
+
+    /* Code Snippets */
+    pre {
+      background-color: var(--code-bg);
+      color: var(--code-text);
+      font-family: var(--f-mono);
+      font-size: 0.85rem;
+      padding: 1.5rem;
+      line-height: 1.4;
+      overflow-x: auto;
+      margin: 2rem 0;
+      border: 1px solid var(--border-thick);
+    }
+    
+    .c-comment { color: #888888; }
+    .c-keyword { color: #ffffff; font-weight: 700; }
+    .c-type { color: #cccccc; }
+
+    /* SVG Figures */
+    .svg-wrapper {
+      margin: 4rem 0;
+      background: var(--bg);
+      border: 1px solid var(--border-thin);
+      padding: 2rem;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .caption {
+      font-family: var(--f-body);
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      margin-top: 1.5rem;
+      font-style: italic;
+      border-left: 2px solid var(--border-thick);
+      padding-left: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .content-grid {
+        grid-template-columns: 1fr;
+      }
+      .param-column {
+        border-right: none;
+        border-bottom: 1px dashed var(--border-thin);
+        padding-right: 0;
+        padding-bottom: 2rem;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 2rem;
+      }
+      .param-box { margin-bottom: 0; }
+      h1 { font-size: 2.2rem; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="tear-down-shell">
+  
+  <header>
+    <div class="meta-tag">Post-Mortem / Mobile Edge Ops</div>
+    <h1>Edge Vision Diagnostics</h1>
+    <p class="abstract">Computer vision tutorials love to pretend hardware is infinite. In reality, deploying an object-detection model to a $150 Android handheld in a poorly lit warehouse is essentially a fight against hardware physics. This is a tear-down of the memory limits, battery bleed, and camera-thread contention that dictate true edge performance.</p>
+  </header>
+
+  <div class="content-grid">
+    
+    <aside class="param-column">
+      <div class="param-box">
+        <strong>Hardware Target</strong>
+        <span>Zebra TC52 (Android)</span>
+      </div>
+      <div class="param-box">
+        <strong>Model Format</strong>
+        <span>TFLite (INT8 Quant)</span>
+      </div>
+      <div class="param-box">
+        <strong>Camera API</strong>
+        <span>Jetpack CameraX</span>
+      </div>
+      <div class="param-box">
+        <strong>Inference Budget</strong>
+        <span>&lt; 50ms / frame</span>
+      </div>
+      <div class="param-box">
+        <strong>Failure Constraint</strong>
+        <span>Thermal Throttling</span>
+      </div>
+    </aside>
+
+    <div class="main-column">
+      
+      <p>The original architecture for this logistics scanning tool was built on a lie: that mobile internet inside a concrete fulfillment center is reliable. We attempted to stream camera frames to a cloud-based inference API. In lab testing, the latency was 150ms. On the warehouse floor, surrounded by metal racking and competing Wi-Fi signals, latency spiked to 2.5 seconds. For a worker attempting to scan 40 boxes a minute, a 2.5-second freeze on a viewfinder isn't just annoying—it effectively destroys the operational utility of the application.</p>
+      
+      <p>If you cannot guarantee network transit time, you cannot execute on the cloud. The model had to be forced down to the client device. But shifting inference to the edge meant trading network latency for local hardware constraints. We were no longer fighting Wi-Fi dropouts; we were fighting RAM allocation limits, CPU thermal throttling, and battery drain on cheap, three-year-old Android scanners.</p>
+
+      <h2>> TRACE_01: FORCED LOCAL ISOLATION</h2>
+
+      <p>To understand the architectural pivot, we have to isolate the "device boundary." A cloud-dependent application treats the mobile device merely as a dumb glass portal: it grabs a frame via the camera sensor, heavily compresses it over HTTP, and waits for a JSON payload to return with bounding boxes. An edge-inferencing application absorbs the entire lifecycle. The device must capture the frame, convert it from YUV to RGB, allocate memory for an inference tensor, feed it to a localized model, parse the outputs, and draw the bounding box onto a canvas—all without dropping below 30 frames per second.</p>
+
+      <div class="svg-wrapper">
+        <svg viewBox="0 0 800 350" preserveAspectRatio="xMidYMid meet">
+          <!-- Separator Line -->
+          <line x1="400" y1="20" x2="400" y2="330" stroke="#111" stroke-width="2" stroke-dasharray="8 4" />
+          
+          <!-- Headers -->
+          <text x="200" y="40" font-family="'JetBrains Mono'" font-size="14" font-weight="700" text-anchor="middle">CLOUD ROUNDTRIP (ABANDONED)</text>
+          <text x="600" y="40" font-family="'JetBrains Mono'" font-size="14" font-weight="700" text-anchor="middle">EDGE INFERENCE (DEPLOYED)</text>
+
+          <!-- Cloud Side (Left) -->
+          <!-- Device Box -->
+          <rect x="140" y="80" width="120" height="40" fill="none" stroke="#555" stroke-width="2" />
+          <text x="200" y="105" font-family="'JetBrains Mono'" font-size="12" fill="#555" text-anchor="middle">FRAME CAPTURE</text>
+
+          <path d="M 200 120 L 200 180" stroke="#555" stroke-width="2" fill="none" />
+          <text x="210" y="145" font-family="'JetBrains Mono'" font-size="10" fill="#888">WLAN Latency</text>
+          <text x="210" y="160" font-family="'JetBrains Mono'" font-size="10" fill="#111" font-weight="700">~800-2500ms</text>
+
+          <!-- Cloud API Box -->
+          <rect x="120" y="180" width="160" height="80" fill="#e8e8e8" stroke="#111" />
+          <text x="200" y="210" font-family="'JetBrains Mono'" font-size="12" fill="#111" font-weight="700" text-anchor="middle">GPU CLUSTER</text>
+          <text x="200" y="235" font-family="'JetBrains Mono'" font-size="10" fill="#555" text-anchor="middle">Inference: 15ms</text>
+          
+          <path d="M 120 220 L 50 220 L 50 100 L 140 100" stroke="#555" stroke-width="2" fill="none" stroke-dasharray="4 4"/>
+          <text x="30" y="150" font-family="'JetBrains Mono'" font-size="10" fill="#888" transform="rotate(-90 30 150)" text-anchor="middle">JSON Payload Return</text>
+
+          <!-- Edge Side (Right) -->
+          <rect x="520" y="80" width="160" height="200" fill="none" stroke="#111" stroke-width="3" />
+          <text x="600" y="70" font-family="'JetBrains Mono'" font-size="10" fill="#111" text-anchor="middle">DEVICE SECURE BOUNDARY</text>
+          
+          <rect x="540" y="100" width="120" height="30" fill="#f5f5f5" stroke="#111" />
+          <text x="600" y="120" font-family="'JetBrains Mono'" font-size="10" fill="#111" font-weight="700" text-anchor="middle">CAMERA SENSOR</text>
+
+          <rect x="540" y="160" width="120" height="30" fill="#f5f5f5" stroke="#111" />
+          <text x="600" y="180" font-family="'JetBrains Mono'" font-size="10" fill="#111" font-weight="700" text-anchor="middle">MEMORY ALLOC (RAM)</text>
+
+          <rect x="540" y="220" width="120" height="40" fill="#111" stroke="#111" />
+          <text x="600" y="245" font-family="'JetBrains Mono'" font-size="10" fill="#fff" font-weight="700" text-anchor="middle">TFLITE INTERPRETER</text>
+
+          <!-- Arrows down -->
+          <path d="M 600 130 L 600 160" stroke="#111" stroke-width="2" fill="none" />
+          <path d="M 600 190 L 600 220" stroke="#111" stroke-width="2" fill="none" />
+
+          <!-- Return Arrow -->
+          <path d="M 540 240 L 480 240 L 480 115 L 540 115" stroke="#111" stroke-width="2" fill="none" />
+          <text x="490" y="180" font-family="'JetBrains Mono'" font-size="10" fill="#111" text-anchor="middle" font-weight="700" transform="rotate(-90 490 180)">Local Loop: &lt;50ms</text>
+
+        </svg>
+        <div class="caption">
+          Device-Capability Boundary. Shifting from a cloud roundtrip to an entirely local execution removes network unreliability but collapses the computational budget down to the available CPU/NPU limits of the mobile handset. The entire ingestion-to-inference loop must be contained within the physical chassis.
+        </div>
+      </div>
+
+      <h2>> THREAD_02: CAMERAX AND CONTINUOUS ANALYSIS</h2>
+
+      <p>Android's original <code>Camera2</code> API is notoriously hostile to computer vision because manually managing device-specific sensor states usually triggers memory leaks on mid-tier hardware. We shifted to the Jetpack <code>CameraX</code> library, specifically isolating the <code>ImageAnalysis</code> use case. Unlike a standard camera app that fires an intent to take a static JPEG, <code>ImageAnalysis</code> buffers a continuous, real-time feed.</p>
+      
+      <p>The trap engineers fall into here is frame starvation. If you run the TensorFlow Lite interpreter directly on the main UI thread, every time the model processes an image (say, taking 60ms), the UI freezes. The app stutters. To solve this, execution must be explicitly bifurcated. The rendering happens on the Main Thread, while frame capture and inference are banished to a designated background Executor.</p>
+
+<pre><code><span class="c-comment">// Android Kotlin: Hooking CameraX ImageAnalysis to a TFLite Interpreter</span>
+<span class="c-keyword">val</span> imageAnalyzer = ImageAnalysis.Builder()
+    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+    .setTargetResolution(Size(320, 320)) <span class="c-comment">// Hardcap resolution for inference</span>
+    .build()
+
+imageAnalyzer.setAnalyzer(cameraExecutor, { imageProxy <span class="c-type">-></span>
+    <span class="c-comment">// 1: Convert YUV_420_888 to RGB Bitmap</span>
+    <span class="c-keyword">val</span> bitmap = yuvToRgbConverter.toBitmap(imageProxy)
+    
+    <span class="c-comment">// 2: Feed the tensor in the background thread</span>
+    <span class="c-keyword">val</span> inputTensor = TensorImage.fromBitmap(bitmap)
+    <span class="c-keyword">val</span> results = tfLiteInterpreter.process(inputTensor)
+    
+    <span class="c-comment">// 3: Switch back to UI thread purely to draw the bounding box overlay</span>
+    runOnUiThread {
+        overlayView.drawBoundingBoxes(results)
+    }
+    
+    <span class="c-comment">// Critical: Release the frame block or the buffer overflows in &lt;2 secs</span>
+    imageProxy.close()
+})
+</code></pre>
+
+      <p>The unglamorous secret in that snippet is <code>STRATEGY_KEEP_ONLY_LATEST</code>. Android's camera can generate 60 frames per second. Our model can only digest 20. If we enqueue every frame, the backlog crashes the app within ten seconds with an <code>OutOfMemoryError</code>. By instructing the API to immediately dump any frame that arrives while the interpreter is busy, we surrender framerate to preserve stability.</p>
+
+      <h2>> MODEL_03: QUANTIZATION AND THERMAL DEATH</h2>
+
+      <p>A standard Float32 neural network exported from Python is roughly 15MB. That sounds small, but when you load it into RAM and attempt to run matrix multiplication on a continuous video feed, the device's CPU spikes to 100%. Within five minutes, the physical back of the phone becomes hot to the touch. The OS detects the thermal limit and aggressively throttles the CPU clock speed. Your 30ms inference time silently deteriorates to 180ms. The app turns to sludge.</p>
+
+      <p>To survive prolonged shifts on the floor, we had to brutally compress the logic. The model was converted from 32-bit floats down to an 8-bit integer quantized format (INT8). Post-training quantization shrinks the model footprint by 4x. Yes, we sacrificed approximately 3% of our baseline accuracy—but in edge engineering, an 80% accurate model that runs for an entire 8-hour shift without catching fire is infinitely more valuable than a 99% accurate model that drains the battery and crashes the CPU inside of twenty minutes.</p>
+
+      <div class="svg-wrapper">
+        <svg viewBox="0 0 800 280" preserveAspectRatio="xMidYMid meet">
+          <!-- Thread lanes -->
+          <rect x="50" y="40" width="700" height="60" fill="#f5f5f5" />
+          <text x="60" y="75" font-family="'JetBrains Mono'" font-size="12" fill="#1a1a1a" font-weight="700">UI THREAD (MAIN)</text>
+
+          <rect x="50" y="120" width="700" height="60" fill="#111" />
+          <text x="60" y="155" font-family="'JetBrains Mono'" font-size="12" fill="#fff" font-weight="700">CAMERAX EXECUTOR (BACKGROUND)</text>
+
+          <rect x="50" y="200" width="700" height="60" fill="#555" />
+          <text x="60" y="235" font-family="'JetBrains Mono'" font-size="12" fill="#fff" font-weight="700">TFLITE INTERPRETER (BACKGROUND/NNAPI)</text>
+
+          <!-- Interaction Blocks -->
+          <!-- Frame 1 lifecycle -->
+          <rect x="250" y="130" width="80" height="40" fill="#e8e8e8" stroke="#111" />
+          <text x="290" y="155" font-family="'JetBrains Mono'" font-size="10" fill="#111" text-anchor="middle">Frame[N]</text>
+          
+          <path d="M 290 170 L 290 200" stroke="#111" stroke-width="2" fill="none" marker-end="url(#arrow-dark)" />
+
+          <rect x="270" y="210" width="100" height="40" fill="#111" stroke="#fff" />
+          <text x="320" y="235" font-family="'JetBrains Mono'" font-size="10" fill="#fff" text-anchor="middle">Infer[N]</text>
+
+          <path d="M 320 210 L 320 120 L 370 120 L 370 100" stroke="#111" stroke-width="2" fill="none" marker-end="url(#arrow-dark)" />
+
+          <rect x="350" y="50" width="100" height="40" fill="#111" stroke="#111" />
+          <text x="400" y="75" font-family="'JetBrains Mono'" font-size="10" fill="#fff" text-anchor="middle">Draw Box[N]</text>
+
+          <!-- Frame Dropping Logic -->
+          <rect x="340" y="130" width="80" height="40" fill="none" stroke="#e8e8e8" stroke-dasharray="2 2" />
+          <text x="380" y="155" font-family="'JetBrains Mono'" font-size="10" fill="#888" text-anchor="middle">Frame[N+1]</text>
+          <text x="380" y="175" font-family="'JetBrains Mono'" font-size="9" fill="#111" font-weight="700" text-anchor="middle">DROPPED</text>
+
+          <rect x="430" y="130" width="80" height="40" fill="#e8e8e8" stroke="#111" />
+          <text x="470" y="155" font-family="'JetBrains Mono'" font-size="10" fill="#111" text-anchor="middle">Frame[N+2]</text>
+
+          <path d="M 470 170 L 470 200" stroke="#111" stroke-width="2" fill="none" marker-end="url(#arrow-dark)" />
+
+          <rect x="450" y="210" width="100" height="40" fill="#111" stroke="#fff" />
+          <text x="500" y="235" font-family="'JetBrains Mono'" font-size="10" fill="#fff" text-anchor="middle">Infer[N+2]</text>
+
+          <path d="M 500 210 L 500 120 L 550 120 L 550 100" stroke="#111" stroke-width="2" fill="none" marker-end="url(#arrow-dark)" />
+
+          <rect x="530" y="50" width="100" height="40" fill="#111" stroke="#111" />
+          <text x="580" y="75" font-family="'JetBrains Mono'" font-size="10" fill="#fff" text-anchor="middle">Draw Box[N+2]</text>
+
+          <defs>
+            <marker id="arrow-dark" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+              <path d="M 0 0 L 10 5 L 0 10 z" fill="#111" />
+            </marker>
+          </defs>
+        </svg>
+        <div class="caption">
+          Android Execution Thread Architecture. The UI thread remains completely unblocked, responsible only for drawing the bounding box overlay. The CameraX framework fires frames constantly, but the system relies entirely on STRATEGY_KEEP_ONLY_LATEST to intentionally drop intermediate frames (like N+1) while the TFLite Interpreter is locked up processing frame N.
+        </div>
+      </div>
+
+      <h2>> EXIT_CODE: REAL-WORLD ACCEPTANCE</h2>
+
+      <p>We launched the edge-architected application to the floor. By cutting out the HTTP roundtrip, scanning latency stabilized at a deterministic 45ms. By quantizing the model to INT8, we stopped melting the CPUs, allowing the handheld batteries to clear a full eight hours. And by strictly isolating the <code>ImageAnalysis</code> loops from the Android UI thread, the application felt native and fluid, even as it quietly dumped two-thirds of the frames the camera sensor captured.</p>
+
+      <p>Logistics computer vision is almost entirely about systems engineering. The cleanest neural network architecture means nothing if you carelessly lock the main rendering thread or bleed out the battery. Moving to the edge is powerful, but only if you respect the brutal physics of the device you are trapped inside.</p>
+      
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
