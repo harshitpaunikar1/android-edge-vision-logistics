@@ -232,13 +232,13 @@
 
     <div class="main-column">
       
-      <p>The original architecture for this logistics scanning tool was built on a lie: that mobile internet inside a concrete fulfillment center is reliable. We attempted to stream camera frames to a cloud-based inference API. In lab testing, the latency was 150ms. On the warehouse floor, surrounded by metal racking and competing Wi-Fi signals, latency spiked to 2.5 seconds. For a worker attempting to scan 40 boxes a minute, a 2.5-second freeze on a viewfinder isn't just annoying—it effectively destroys the operational utility of the application.</p>
+      <p>The original architecture for this logistics scanning tool was built on a lie: that mobile internet inside a concrete fulfillment center is reliable. We attempted to stream camera frames to a cloud-based inference API. In lab testing, the latency was 150ms. On the warehouse floor, surrounded by metal racking and competing Wi-Fi signals, latency spiked to 2.5 seconds. For a worker attempting to scan 40 boxes a minute, a 2.5-second freeze on a viewfinder isn't just annoying-it effectively destroys the operational utility of the application.</p>
       
       <p>If you cannot guarantee network transit time, you cannot execute on the cloud. The model had to be forced down to the client device. But shifting inference to the edge meant trading network latency for local hardware constraints. We were no longer fighting Wi-Fi dropouts; we were fighting RAM allocation limits, CPU thermal throttling, and battery drain on cheap, three-year-old Android scanners.</p>
 
       <h2>> TRACE_01: FORCED LOCAL ISOLATION</h2>
 
-      <p>To understand the architectural pivot, we have to isolate the "device boundary." A cloud-dependent application treats the mobile device merely as a dumb glass portal: it grabs a frame via the camera sensor, heavily compresses it over HTTP, and waits for a JSON payload to return with bounding boxes. An edge-inferencing application absorbs the entire lifecycle. The device must capture the frame, convert it from YUV to RGB, allocate memory for an inference tensor, feed it to a localized model, parse the outputs, and draw the bounding box onto a canvas—all without dropping below 30 frames per second.</p>
+      <p>To understand the architectural pivot, we have to isolate the "device boundary." A cloud-dependent application treats the mobile device merely as a dumb glass portal: it grabs a frame via the camera sensor, heavily compresses it over HTTP, and waits for a JSON payload to return with bounding boxes. An edge-inferencing application absorbs the entire lifecycle. The device must capture the frame, convert it from YUV to RGB, allocate memory for an inference tensor, feed it to a localized model, parse the outputs, and draw the bounding box onto a canvas-all without dropping below 30 frames per second.</p>
 
       <div class="svg-wrapper">
         <svg viewBox="0 0 800 350" preserveAspectRatio="xMidYMid meet">
@@ -329,7 +329,7 @@ imageAnalyzer.setAnalyzer(cameraExecutor, { imageProxy <span class="c-type">-></
 
       <p>A standard Float32 neural network exported from Python is roughly 15MB. That sounds small, but when you load it into RAM and attempt to run matrix multiplication on a continuous video feed, the device's CPU spikes to 100%. Within five minutes, the physical back of the phone becomes hot to the touch. The OS detects the thermal limit and aggressively throttles the CPU clock speed. Your 30ms inference time silently deteriorates to 180ms. The app turns to sludge.</p>
 
-      <p>To survive prolonged shifts on the floor, we had to brutally compress the logic. The model was converted from 32-bit floats down to an 8-bit integer quantized format (INT8). Post-training quantization shrinks the model footprint by 4x. Yes, we sacrificed approximately 3% of our baseline accuracy—but in edge engineering, an 80% accurate model that runs for an entire 8-hour shift without catching fire is infinitely more valuable than a 99% accurate model that drains the battery and crashes the CPU inside of twenty minutes.</p>
+      <p>To survive prolonged shifts on the floor, we had to brutally compress the logic. The model was converted from 32-bit floats down to an 8-bit integer quantized format (INT8). Post-training quantization shrinks the model footprint by 4x. Yes, we sacrificed approximately 3% of our baseline accuracy-but in edge engineering, an 80% accurate model that runs for an entire 8-hour shift without catching fire is infinitely more valuable than a 99% accurate model that drains the battery and crashes the CPU inside of twenty minutes.</p>
 
       <div class="svg-wrapper">
         <svg viewBox="0 0 800 280" preserveAspectRatio="xMidYMid meet">

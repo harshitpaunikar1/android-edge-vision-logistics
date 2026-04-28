@@ -34,7 +34,7 @@
 - Deliverable: I wrapped up the day with data model draft mostly in place. It was not perfect, but it was good enough to keep the project moving. There were still a couple of loose parts, but nothing serious enough to block the next step.
 ## 2024-07-01 - Day 5: Data model
 
-- Task summary: Got stuck mid-afternoon and had to regroup — updated the requirements file — had missed one indirect dependency.
+- Task summary: Got stuck mid-afternoon and had to regroup - updated the requirements file - had missed one indirect dependency.
 - Deliverable: Solid now, moving on.
 ## 2024-07-01 - Day 5: Data model
 
@@ -66,7 +66,7 @@
 - Deliverable: Ended the day with documented project in hand, plus a few side notes on what still needed fixing later. There were still a couple of loose parts, but nothing serious enough to block the next step.
 ## 2024-07-09 - Day 11: Documentation check
 
-- Task summary: Quick follow-up: pushed a tiny fix after a teammate's comment — nothing major, just a wording issue in the output.
+- Task summary: Quick follow-up: pushed a tiny fix after a teammate's comment - nothing major, just a wording issue in the output.
 - Deliverable: One of those satisfying small wins.
 ## 2024-07-10 - Day 12: Polish wrap
 
